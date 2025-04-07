@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.javaweb.model.BuildingDTO;
+import com.javaweb.model.BuildingSearchRequest;
 import com.javaweb.model.ErrorResonseDTO;
 import com.javaweb.service.BuildingService;
 
@@ -33,9 +34,8 @@ public class BuildingAPI {
 	@Autowired
 	private BuildingService buildingService;
 	@GetMapping(value="/api/building/")
-	public List<BuildingDTO> getBuilding(@RequestParam(name="name", required=false) String name,
-			                             @RequestParam(name="numberofbasement", required=false) Integer numberofbasement){
-		List<BuildingDTO> result = buildingService.findAll(name,numberofbasement);
+	public List<BuildingDTO> getBuilding(BuildingSearchRequest request){
+		List<BuildingDTO> result = buildingService.findAll(request);
 		return result;
 	}
 	
