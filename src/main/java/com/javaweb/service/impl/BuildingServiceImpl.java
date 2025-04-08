@@ -1,7 +1,11 @@
 package com.javaweb.service.impl;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +14,13 @@ import org.springframework.stereotype.Service;
 import com.javaweb.model.BuildingDTO;
 import com.javaweb.model.BuildingSearchRequest;
 import com.javaweb.repository.BuildingRepository;
-import com.javaweb.repository.entity.TotalEntity;
+import com.javaweb.repository.RentTypeRepository;
+import com.javaweb.repository.entity.BuildingEntity;
+import com.javaweb.repository.entity.BuildingRentTypeEntity;
+import com.javaweb.repository.entity.DistrictEntity;
+import com.javaweb.repository.entity.RentTypeEntity;
+import com.javaweb.repository.impl.BuildingRentTypeRepository;
+import com.javaweb.repository.impl.DistrictRepository;
 import com.javaweb.service.BuildingService;
 
 @Service
@@ -18,27 +28,41 @@ public class BuildingServiceImpl implements BuildingService{
 	@Autowired
 	private BuildingRepository buildingRepository;
 	@Autowired
+	private DistrictRepository districtRepository;
+	@Autowired
+	private BuildingRentTypeRepository buildingRentTypeRepository;
+	@Autowired
+	private RentTypeRepository rentTypeRepository;
+	@Autowired
 	private ModelMapper modelMapper;
 	@Override
 	
-	public List<BuildingDTO> findAll(BuildingSearchRequest request) {
-		List<TotalEntity> list = buildingRepository.findAll(request);
-		List<BuildingDTO> buildings= new ArrayList<>();
-		for(TotalEntity x : list) {
-			BuildingDTO building= new BuildingDTO() ;
-			building.setName(x.getBuildingEntity().getName());
-			building.setAddress(x.getBuildingEntity().getStreet()+","+x.getBuildingEntity().getWard()+","+ x.getDistrictEntity().getDistrictName());
-			building.setNumberOfBasement(x.getBuildingEntity().getNumberOfBasement());
-			building.setManagerName(x.getBuildingEntity().getManagerName());
-			building.setManagerPhoneNumber(x.getBuildingEntity().getManagerPhoneNumber());
-			building.setFloorArea(x.getBuildingEntity().getFloorArea());
-			building.setRentPrice(x.getBuildingEntity().getRentPrice());
-			building.setServicePrice(x.getBuildingEntity().getServiceFee());
-			building.setBrokageFee(x.getBuildingEntity().getBrokerageFee());
-			building.setBuildingRentType(x.getRentTypeEntity().getRentTypeName());
-			buildings.add(building);
+	public List<BuildingDTO> findAll(Map<String,Object> params, List<String> buildingRentType) {
+		List<BuildingDTO> result= new ArrayList<>();
+		List<BuildingEntity> buildingEntities = buildingRepository.findAll(params, buildingRentType);
+		for (BuildingEntity item : buildingEntities) {
+		    BuildingDTO building = modelMapper.map(item, BuildingDTO.class);
+
+		    List<BuildingRentTypeEntity> buildingRent = buildingRentTypeRepository.findId(item.getId());
+		    List<RentTypeEntity> rs = new ArrayList<>();
+		    for (BuildingRentTypeEntity it : buildingRent) {
+		        RentTypeEntity rentTypeEntity = rentTypeRepository.findRentTypeById(it.getBuildingRentTypeRentTypeId());
+		        rs.add(rentTypeEntity);
+		    }
+		    String rent = rs.stream()
+		        .map(it -> it.getRentTypeName().toString())
+		        .distinct()
+		        .collect(Collectors.joining(","));
+
+		    building.setBuildingRentType(rent);
+
+		    DistrictEntity districtEntity = districtRepository.findNameById(item.getDistrictId());
+		    building.setAddress(item.getStreet() + "," + item.getWard() + "," + districtEntity.getDistrictName());
+
+		    result.add(building);
 		}
-		return buildings;
+
+		return result;
 	}
 	
 }

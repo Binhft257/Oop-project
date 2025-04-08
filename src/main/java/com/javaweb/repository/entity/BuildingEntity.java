@@ -1,34 +1,33 @@
 package com.javaweb.repository.entity;
 
 public class BuildingEntity {
-	private String name;
-	private Integer numberOfBasement;
 	private String ward;
+	private Integer districtId;
 	private String street;
-	private Integer floorArea;
-	private String direction;
+	private Integer id;
+	
+	private String name;
+	private String address;
+	private Integer numberOfBasement;
 	private String managerName;
 	private Integer managerPhoneNumber;
-	private Integer brokerageFee;
-	private Integer serviceFee;
+	private Integer floorArea;
+	private String DTtrong;
 	private Integer rentPrice;
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
-	public Integer getNumberOfBasement() {
-		return numberOfBasement;
-	}
-	public void setNumberOfBasement(Integer numberOfBasement) {
-		this.numberOfBasement = numberOfBasement;
-	}
+	private Integer serviceFee;
+	private Integer brokerageFee;
+	private String buildingRentType;
 	public String getWard() {
 		return ward;
 	}
 	public void setWard(String ward) {
 		this.ward = ward;
+	}
+	public Integer getDistrictId() {
+		return districtId;
+	}
+	public void setDistrictId(Integer districtId) {
+		this.districtId = districtId;
 	}
 	public String getStreet() {
 		return street;
@@ -36,17 +35,30 @@ public class BuildingEntity {
 	public void setStreet(String street) {
 		this.street = street;
 	}
-	public Integer getFloorArea() {
-		return floorArea;
+
+	public Integer getId() {
+		return id;
 	}
-	public void setFloorArea(Integer floorArea) {
-		this.floorArea = floorArea;
+	public void setId(Integer id) {
+		this.id = id;
 	}
-	public String getDirection() {
-		return direction;
+	public String getName() {
+		return name;
 	}
-	public void setDirection(String direction) {
-		this.direction = direction;
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getAddress() {
+		return address;
+	}
+	public void setAddress(String address) {
+		this.address = address;
+	}
+	public Integer getNumberOfBasement() {
+		return numberOfBasement;
+	}
+	public void setNumberOfBasement(Integer numberOfBasement) {
+		this.numberOfBasement = numberOfBasement;
 	}
 	public String getManagerName() {
 		return managerName;
@@ -60,11 +72,23 @@ public class BuildingEntity {
 	public void setManagerPhoneNumber(Integer managerPhoneNumber) {
 		this.managerPhoneNumber = managerPhoneNumber;
 	}
-	public Integer getBrokerageFee() {
-		return brokerageFee;
+	public Integer getFloorArea() {
+		return floorArea;
 	}
-	public void setBrokerageFee(Integer brokerageFee) {
-		this.brokerageFee = brokerageFee;
+	public void setFloorArea(Integer floorArea) {
+		this.floorArea = floorArea;
+	}
+	public String getDTtrong() {
+		return DTtrong;
+	}
+	public void setDTtrong(String dTtrong) {
+		DTtrong = dTtrong;
+	}
+	public Integer getRentPrice() {
+		return rentPrice;
+	}
+	public void setRentPrice(Integer rentPrice) {
+		this.rentPrice = rentPrice;
 	}
 	public Integer getServiceFee() {
 		return serviceFee;
@@ -72,11 +96,17 @@ public class BuildingEntity {
 	public void setServiceFee(Integer serviceFee) {
 		this.serviceFee = serviceFee;
 	}
-	public Integer getRentPrice() {
-		return rentPrice;
+	public Integer getBrokerageFee() {
+		return brokerageFee;
 	}
-	public void setRentPrice(Integer rentPrice) {
-		this.rentPrice = rentPrice;
+	public void setBrokerageFee(Integer brokerageFee) {
+		this.brokerageFee = brokerageFee;
+	}
+	public String getBuildingRentType() {
+		return buildingRentType;
+	}
+	public void setBuildingRentType(String buildingRentType) {
+		this.buildingRentType = buildingRentType;
 	}
 	
 	

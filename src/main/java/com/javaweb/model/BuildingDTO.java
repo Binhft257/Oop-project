@@ -12,7 +12,7 @@ public class BuildingDTO {
 	private String DTtrong;
 	private Integer rentPrice;
 	private Integer servicePrice;
-	private Integer brokageFee;
+	private Integer brokerageFee;
 	private String buildingRentType;
 	
 	
@@ -77,12 +77,13 @@ public class BuildingDTO {
 	public void setServicePrice(Integer servicePrice) {
 		this.servicePrice = servicePrice;
 	}
-	public Integer getBrokageFee() {
-		return brokageFee;
+	public Integer getBrokerageFee() {
+		return brokerageFee;
 	}
-	public void setBrokageFee(Integer brokageFee) {
-		this.brokageFee = brokageFee;
+	public void setBrokerageFee(Integer brokerageFee) {
+		this.brokerageFee = brokerageFee;
 	}
+
 	
 
 }
