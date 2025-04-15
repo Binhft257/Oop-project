@@ -11,6 +11,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.javaweb.builder.BuildingSearchBuilder;
+import com.javaweb.converter.BuildingSearchBuilderConverter;
 import com.javaweb.model.BuildingDTO;
 import com.javaweb.model.BuildingSearchRequest;
 import com.javaweb.repository.BuildingRepository;
@@ -35,11 +37,14 @@ public class BuildingServiceImpl implements BuildingService{
 	private RentTypeRepository rentTypeRepository;
 	@Autowired
 	private ModelMapper modelMapper;
+	@Autowired
+	private BuildingSearchBuilderConverter buildingSearchBuilderConverter;
 	@Override
 	
 	public List<BuildingDTO> findAll(Map<String,Object> params, List<String> buildingRentType) {
+		BuildingSearchBuilder buildingSearchBuilder = buildingSearchBuilderConverter.toBuildingSearchBuilder(params, buildingRentType);
 		List<BuildingDTO> result= new ArrayList<>();
-		List<BuildingEntity> buildingEntities = buildingRepository.findAll(params, buildingRentType);
+		List<BuildingEntity> buildingEntities = buildingRepository.findAll(buildingSearchBuilder);
 		for (BuildingEntity item : buildingEntities) {
 		    BuildingDTO building = modelMapper.map(item, BuildingDTO.class);
 
