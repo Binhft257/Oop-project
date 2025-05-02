@@ -1,4 +1,4 @@
-package com.javaweb.repository.impl;
+package com.javaweb.repository.custom.impl;
 
 import java.lang.reflect.Field;
 import java.sql.Connection;
@@ -16,16 +16,19 @@ import org.springframework.stereotype.Repository;
 
 import com.javaweb.builder.BuildingSearchBuilder;
 import com.javaweb.repository.BuildingRepository;
+import com.javaweb.repository.custom.BuildingRepositoryCustom;
 import com.javaweb.repository.entity.BuildingEntity;
 
 import com.javaweb.util.ConnectionJDBCUtil;
 import com.javaweb.util.NumberUtil;
 import com.javaweb.util.StringUtil;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
 @Repository
-public class BuildingRepositoryImpl implements BuildingRepository {
-	static final String DB_URL = "jdbc:mysql://localhost:3306/building_rental?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
-	static final String USER = "root";
-	static final String PASS = "Binh25072005";
+public class BuildingRepositoryImpl implements BuildingRepositoryCustom  {
+	
 
 	
     public static void join(BuildingSearchBuilder buildingSearchBuilder, StringBuilder sql) {
@@ -109,8 +112,9 @@ public class BuildingRepositoryImpl implements BuildingRepository {
         	where.append(" ) ");
         }
     }
-
-	@Override
+    @PersistenceContext
+    private EntityManager entityManager;
+    @Override
 	public List<BuildingEntity> findAll(BuildingSearchBuilder buildingSearchBuilder) {
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT b.district_id, b.id,b.name, b.ward, b.street, b.direction,  ");
@@ -123,39 +127,11 @@ public class BuildingRepositoryImpl implements BuildingRepository {
 		querySpecial(buildingSearchBuilder,where);
 		where.append(" group by b.id ");
 		sql.append(where);
-	    List<BuildingEntity> result = new ArrayList<>();
-	        
-//	        try(Connection conn= ConnectionJDBCUtil.getConnection();
-//	            Statement stmt = conn.createStatement();
-//	            ResultSet rs = stmt.executeQuery(sql.toString());){
-	    try(Connection conn = DriverManager.getConnection(DB_URL, USER, PASS)) {
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(sql.toString()	);
-	            
-	            
-	            while(rs.next()) {
-                BuildingEntity buildingEntity = new BuildingEntity();
-                buildingEntity.setId(rs.getInt("id"));
-                buildingEntity.setName(rs.getString("name"));
-                buildingEntity.setWard(rs.getString("ward"));
-                buildingEntity.setNumberOfBasement(rs.getInt("numberofbasement"));
-                buildingEntity.setDistrictId(rs.getInt("district_id"));
-                buildingEntity.setStreet(rs.getString("street"));
-                buildingEntity.setFloorArea(rs.getInt("floorarea"));
-                buildingEntity.setRentPrice(rs.getInt("rentprice"));
-                buildingEntity.setServiceFee(rs.getInt("servicefee"));
-                buildingEntity.setBrokerageFee(rs.getInt("brokeragefee"));
-                buildingEntity.setManagerName(rs.getString("managername"));
-                buildingEntity.setManagerPhoneNumber(rs.getInt("managerphonenumber"));
-                result.add(buildingEntity);
-	            }
-	        } catch (SQLException e) {
-	            e.printStackTrace();
-	            System.out.println("Connected database failed...");
-	        }
-		return result;
-	}
-}	    
+		Query query= entityManager.createNativeQuery(sql.toString(),BuildingEntity.class);
+		return query.getResultList();
+		
+}
+}
 	
 		    
     

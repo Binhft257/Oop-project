@@ -1,34 +1,86 @@
 package com.javaweb.repository.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.hibernate.annotations.ManyToAny;
+
+import jakarta.annotation.Generated;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+@Entity
+@Table(name="building")
+
 public class BuildingEntity {
-	private String ward;
-	private Integer districtId;
-	private String street;
+	@Id
+	@GeneratedValue(strategy= GenerationType.IDENTITY)
 	private Integer id;
 	
+	@Column(name="name")
 	private String name;
-	private String address;
+	
+	@Column(name="street")
+	private String street;
+	
+	@Column(name="ward")
+	private String ward;
+	
+	
+	@Column(name="numberofbasement")
 	private Integer numberOfBasement;
+	
+	@Column(name="managername")
 	private String managerName;
+	
+	@Column(name="managerphonenumber")
 	private Integer managerPhoneNumber;
+	
+	@Column(name="floorarea")
 	private Integer floorArea;
-	private String DTtrong;
+
+	@Column(name="rentprice")
 	private Integer rentPrice;
+	
+	@Column(name="servicefee")
 	private Integer serviceFee;
+	
+	@Column(name="brokeragefee")
 	private Integer brokerageFee;
-	private String buildingRentType;
+	
+	@ManyToOne
+	@JoinColumn(name= "district_id")
+	private DistrictEntity district;
+	
+	@ManyToMany(fetch=FetchType.LAZY)
+	@JoinTable(name="buildingrenttype",
+			   joinColumns = @JoinColumn(name="building_id", nullable=false),
+			   inverseJoinColumns = @JoinColumn(name="renttype_id", nullable=false))
+		private List<RentTypeEntity> rents= new ArrayList<>();
+	
+	
+	public DistrictEntity getDistrict() {
+		return district;
+	}
+	public void setDistrict(DistrictEntity district) {
+		this.district = district;
+	}
 	public String getWard() {
 		return ward;
 	}
 	public void setWard(String ward) {
 		this.ward = ward;
 	}
-	public Integer getDistrictId() {
-		return districtId;
-	}
-	public void setDistrictId(Integer districtId) {
-		this.districtId = districtId;
-	}
+	
 	public String getStreet() {
 		return street;
 	}
@@ -47,12 +99,6 @@ public class BuildingEntity {
 	}
 	public void setName(String name) {
 		this.name = name;
-	}
-	public String getAddress() {
-		return address;
-	}
-	public void setAddress(String address) {
-		this.address = address;
 	}
 	public Integer getNumberOfBasement() {
 		return numberOfBasement;
@@ -78,12 +124,6 @@ public class BuildingEntity {
 	public void setFloorArea(Integer floorArea) {
 		this.floorArea = floorArea;
 	}
-	public String getDTtrong() {
-		return DTtrong;
-	}
-	public void setDTtrong(String dTtrong) {
-		DTtrong = dTtrong;
-	}
 	public Integer getRentPrice() {
 		return rentPrice;
 	}
@@ -102,12 +142,14 @@ public class BuildingEntity {
 	public void setBrokerageFee(Integer brokerageFee) {
 		this.brokerageFee = brokerageFee;
 	}
-	public String getBuildingRentType() {
-		return buildingRentType;
+	public List<RentTypeEntity> getRents() {
+		return rents;
 	}
-	public void setBuildingRentType(String buildingRentType) {
-		this.buildingRentType = buildingRentType;
+	public void setRents(List<RentTypeEntity> rents) {
+		this.rents = rents;
 	}
 	
+	
+
 	
 }

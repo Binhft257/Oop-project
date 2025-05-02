@@ -1,4 +1,4 @@
-package com.javaweb.repository.impl;
+package com.javaweb.repository;
 
 import java.util.List;
 
