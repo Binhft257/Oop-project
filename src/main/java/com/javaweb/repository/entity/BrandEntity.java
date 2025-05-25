@@ -12,21 +12,31 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 @Entity
-@Table(name="district")
+@Table(name="brand")
 
-public class DistrictEntity {
+public class BrandEntity {
 	@Id
 	@GeneratedValue(strategy= GenerationType.IDENTITY)
 	private Integer Id;
 	
-	@Column(name="code")
-	private String code;
-	
 	@Column(name="name")
 	private String name;
 	
-	@OneToMany(mappedBy= "district", fetch=FetchType.LAZY)
-	private List<BuildingEntity> buildings=new ArrayList<>();
+	@OneToMany(mappedBy= "brand", fetch=FetchType.LAZY)
+	private List<LaptopModelEntity> laptopModel=new ArrayList<>();
+	
+	@OneToMany(mappedBy= "brands", fetch=FetchType.LAZY)
+	private List<CpuEntity> cpu=new ArrayList<>();
+	
+	
+
+	public List<CpuEntity> getCpu() {
+		return cpu;
+	}
+
+	public void setCpu(List<CpuEntity> cpu) {
+		this.cpu = cpu;
+	}
 
 	public Integer getId() {
 		return Id;
@@ -34,14 +44,6 @@ public class DistrictEntity {
 
 	public void setId(Integer id) {
 		Id = id;
-	}
-
-	public String getCode() {
-		return code;
-	}
-
-	public void setCode(String code) {
-		this.code = code;
 	}
 
 	public String getName() {
@@ -52,12 +54,14 @@ public class DistrictEntity {
 		this.name = name;
 	}
 
-	public List<BuildingEntity> getBuildings() {
-		return buildings;
+	public List<LaptopModelEntity> getLaptopModel() {
+		return laptopModel;
 	}
 
-	public void setBuildings(List<BuildingEntity> buildings) {
-		this.buildings = buildings;
+	public void setLaptopModel(List<LaptopModelEntity> laptopModel) {
+		this.laptopModel = laptopModel;
 	}
+
+
 }
 	
