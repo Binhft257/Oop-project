@@ -22,7 +22,6 @@ public class LaptopRepositoryImpl implements LaptopRepositoryCustom {
     private EntityManager entityManager;
 
     private void join(LaptopSearchBuilder builder, StringBuilder sql) {
-        boolean joined = false;
 
         if (builder.getRam() != null && !builder.getRam().isEmpty()) {
             sql.append(" JOIN ram r ON lc.ram_id = r.id ");
@@ -33,14 +32,14 @@ public class LaptopRepositoryImpl implements LaptopRepositoryCustom {
         if (builder.getStorageCapacity() != null && !builder.getStorageCapacity().isEmpty()) {
             sql.append(" JOIN storage s ON lc.storage_id = s.id ");
         }
-        if (builder.getPriceFrom() != null || builder.getPriceTo() != null) {
-            // giá nằm trực tiếp ở laptop_configuration
-        }
         if (builder.getCpu() != null) {
             sql.append(" JOIN cpu c ON lc.cpu_id = c.id ");
         }
-        if (builder.getBrand() != null) {
+        if (builder.getBrand() != null || builder.getModel() != null) {
             sql.append(" JOIN laptopmodel lm ON lc.model_id = lm.id ");
+        }
+
+        if (builder.getBrand() != null) {
             sql.append(" JOIN brand b ON lm.brand_id = b.id ");
         }
         if (builder.getDisplaySizeFrom() != null || builder.getDisplaySizeTo() != null) {
@@ -87,6 +86,9 @@ public class LaptopRepositoryImpl implements LaptopRepositoryCustom {
         }
         if (builder.getBrand() != null) {
             where.append(" AND b.name LIKE '%").append(builder.getBrand()).append("%' ");
+        }
+        if (builder.getModel() != null) {
+            where.append(" AND lm.model_name LIKE '%").append(builder.getModel()).append("%' ");
         }
         if (builder.getStorageCapacity() != null && !builder.getStorageCapacity().isEmpty()) {
             String storageCondition = builder.getStorageCapacity().stream()

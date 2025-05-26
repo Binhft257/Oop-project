@@ -4,6 +4,7 @@ import java.util.List;
 
 public class LaptopSearchBuilder {
 	private String brand;
+	private String model;
 	private Integer priceFrom;
 	private Integer priceTo;
 	private String cpu;
@@ -16,6 +17,10 @@ public class LaptopSearchBuilder {
 	private String Os;
 	
 	
+
+	public String getModel() {
+		return model;
+	}
 
 	public List<Integer> getStorageCapacity() {
 		return storageCapacity;
@@ -65,6 +70,7 @@ public class LaptopSearchBuilder {
 	public LaptopSearchBuilder(Builder builder) {
 		super();
 		this.brand = builder.brand;
+		this.model = builder.model;
 		this.priceFrom = builder.priceFrom;
 		this.priceTo = builder.priceTo;
 		this.cpu = builder.cpu;
@@ -80,6 +86,7 @@ public class LaptopSearchBuilder {
 
 	public static class Builder {
 		private String brand;
+		private String model;
 		private Integer priceFrom;
 		private Integer priceTo;
 		private String cpu;
@@ -107,6 +114,11 @@ public class LaptopSearchBuilder {
 			this.brand = brand;
 			return this;
 		}
+		public Builder setModel(String model) {
+			this.model = model;
+			return this;
+		}
+
 
 		public Builder setPriceFrom(Integer priceFrom) {
 			this.priceFrom = priceFrom;

@@ -12,6 +12,7 @@ public class LaptopSearchBuilderConverter {
 	public LaptopSearchBuilder toLaptopSearchBuilder(Map<String, Object> params, List<Integer> ram,List<String> gpu, List<Integer> storageCapacity) {
 		LaptopSearchBuilder laptopSearchBuilder = new LaptopSearchBuilder.Builder()
 				.setBrand(MapUtil.getObject(params, "brand", String.class))
+				.setModel(MapUtil.getObject(params, "model", String.class))
 				.setPriceFrom(MapUtil.getObject(params, "priceFrom", Integer.class))
 				.setPriceTo(MapUtil.getObject(params, "priceTo", Integer.class))
 				.setCpu(MapUtil.getObject(params, "cpu", String.class))
