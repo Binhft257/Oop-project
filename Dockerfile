@@ -1,5 +1,5 @@
 # Sử dụng image JDK 17 chính thức
-FROM eclipse-temurin:21-jdk
+FROM maven:3.9.6-eclipse-temurin-21
 
 # Đặt thư mục làm việc trong container
 WORKDIR /app
