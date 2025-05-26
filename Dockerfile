@@ -11,4 +11,4 @@ COPY . .
 RUN mvn clean package -DskipTests
 
 # Chạy file JAR đã build (cần thay bằng đúng tên file JAR thực tế nếu khác)
-CMD ["java", "-jar", "target/spring-boot-non-jwt-1.0.jar"]
+CMD ["java", "-jar", "./target/spring-boot-non-jwt-1.0.jar"]
