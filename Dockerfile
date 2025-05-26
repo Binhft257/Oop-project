@@ -8,7 +8,7 @@ WORKDIR /app
 COPY . .
 
 # Build ứng dụng bằng Maven Wrapper
-RUN ./mvnw clean package -DskipTests
+RUN mvn clean package -DskipTests
 
 # Chạy file JAR đã build (cần thay bằng đúng tên file JAR thực tế nếu khác)
 CMD ["java", "-jar", "target/spring-boot-non-jwt-v2-1.0.jar"]
