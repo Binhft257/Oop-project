@@ -3,7 +3,6 @@ package com.javaweb.repository.custom.impl;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Repository;
 
@@ -13,104 +12,91 @@ import com.javaweb.repository.entity.LaptopConfigurationEntity;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.Query;
+import jakarta.persistence.TypedQuery;
 
 @Repository
 public class LaptopRepositoryImpl implements LaptopRepositoryCustom {
 
     @PersistenceContext
-    private EntityManager entityManager;
-
-    private void join(LaptopSearchBuilder builder, StringBuilder sql) {
-
-        if (builder.getRam() != null && !builder.getRam().isEmpty()) {
-            sql.append(" JOIN ram r ON lc.ram_id = r.id ");
-        }
-        if (builder.getGpu() != null && !builder.getGpu().isEmpty()) {
-            sql.append(" JOIN gpu g ON lc.gpu_id = g.id ");
-        }
-        if (builder.getStorageCapacity() != null && !builder.getStorageCapacity().isEmpty()) {
-            sql.append(" JOIN storage s ON lc.storage_id = s.id ");
-        }
-        if (builder.getCpu() != null) {
-            sql.append(" JOIN cpu c ON lc.cpu_id = c.id ");
-        }
-        if (builder.getBrand() != null || builder.getModel() != null) {
-            sql.append(" JOIN laptopmodel lm ON lc.model_id = lm.id ");
-        }
-
-        if (builder.getBrand() != null) {
-            sql.append(" JOIN brand b ON lm.brand_id = b.id ");
-        }
-        if (builder.getDisplaySizeFrom() != null || builder.getDisplaySizeTo() != null) {
-            sql.append(" JOIN display d ON lc.display_id = d.id ");
-        }
-    }
-
-    private void queryNormal(LaptopSearchBuilder builder, StringBuilder where) {
-        if (builder.getColor() != null) {
-            where.append(" AND lc.color LIKE '%").append(builder.getColor()).append("%' ");
-        }
-        if (builder.getOs() != null) {
-            where.append(" AND lc.os LIKE '%").append(builder.getOs()).append("%' ");
-        }
-        if (builder.getPriceFrom() != null) {
-            where.append(" AND lc.price >= ").append(builder.getPriceFrom());
-        }
-        if (builder.getPriceTo() != null) {
-            where.append(" AND lc.price <= ").append(builder.getPriceTo());
-    }
-    }
-
-    private void querySpecial(LaptopSearchBuilder builder, StringBuilder where) {
-        if (builder.getRam() != null && !builder.getRam().isEmpty()) {
-            String ramCondition = builder.getRam().stream()
-                .map(cap -> "r.capacity = " + cap)
-                .collect(Collectors.joining(" OR "));
-            where.append(" AND (").append(ramCondition).append(") ");
-        }
-        if (builder.getCpu() != null) {
-            where.append(" AND c.model LIKE '%").append(builder.getCpu()).append("%' ");
-        }
-        if (builder.getGpu() != null && !builder.getGpu().isEmpty()) {
-            String gpuCondition = builder.getGpu().stream()
-                .map(gpu -> "LOWER(g.name) LIKE '%" + gpu.toLowerCase() + "%'")
-                .collect(Collectors.joining(" OR "));
-            where.append(" AND (").append(gpuCondition).append(") ");
-        }
-        if (builder.getDisplaySizeFrom() != null) {
-            where.append(" AND d.size >= ").append(builder.getDisplaySizeFrom());
-        }
-        if (builder.getDisplaySizeTo() != null) {
-            where.append(" AND d.size <= ").append(builder.getDisplaySizeTo());
-        }
-        if (builder.getBrand() != null) {
-            where.append(" AND b.name LIKE '%").append(builder.getBrand()).append("%' ");
-        }
-        if (builder.getModel() != null) {
-            where.append(" AND lm.model_name LIKE '%").append(builder.getModel()).append("%' ");
-        }
-        if (builder.getStorageCapacity() != null && !builder.getStorageCapacity().isEmpty()) {
-            String storageCondition = builder.getStorageCapacity().stream()
-                .map(cap -> "s.capacity = " + cap)
-                .collect(Collectors.joining(" OR "));
-            where.append(" AND (").append(storageCondition).append(") ");
-        }
-    }
+    private EntityManager em;
 
     @Override
-    public List<LaptopConfigurationEntity> findAll(LaptopSearchBuilder builder) {
-        StringBuilder sql = new StringBuilder("SELECT lc.* FROM laptopconfiguration lc ");
-        join(builder, sql);
+    public List<LaptopConfigurationEntity> findAll(LaptopSearchBuilder b) {
+        // 1. Build JPQL with join fetch all needed associations
+        StringBuilder jpql = new StringBuilder();
+        jpql.append("SELECT DISTINCT lc ")
+            .append("FROM LaptopConfigurationEntity lc ")
+            .append("JOIN FETCH lc.laptopModel m ")
+            .append("JOIN FETCH m.brand br ")
+            .append("JOIN FETCH lc.cpu c ")
+            .append("JOIN FETCH lc.gpu g ")
+            .append("JOIN FETCH lc.ram r ")
+            .append("JOIN FETCH lc.storage s ")
+            .append("JOIN FETCH lc.display d ")
+            .append("LEFT JOIN FETCH lc.reviews rv ")
+            .append("LEFT JOIN FETCH lc.rating rt ")
+            .append("WHERE 1=1 ");
 
-        StringBuilder where = new StringBuilder(" WHERE 1=1 ");
-        queryNormal(builder, where);
-        querySpecial(builder, where);
+        // 2. Dynamic WHERE clauses
+        Map<String, Object> params = new HashMap<>();
 
-        sql.append(where);
-        sql.append(" GROUP BY lc.id ");
+        if (b.getBrand() != null) {
+            jpql.append(" AND LOWER(br.name) LIKE :brand ");
+            params.put("brand", "%" + b.getBrand().toLowerCase() + "%");
+        }
+        if (b.getModel() != null) {
+            jpql.append(" AND LOWER(m.modelName) LIKE :model ");
+            params.put("model", "%" + b.getModel().toLowerCase() + "%");
+        }
+        if (b.getOs() != null) {
+            jpql.append(" AND LOWER(lc.os) LIKE :os ");
+            params.put("os", "%" + b.getOs().toLowerCase() + "%");
+        }
+        if (b.getColor() != null) {
+            jpql.append(" AND LOWER(lc.color) LIKE :color ");
+            params.put("color", "%" + b.getColor().toLowerCase() + "%");
+        }
+        if (b.getPriceFrom() != null) {
+            jpql.append(" AND lc.price >= :priceFrom ");
+            params.put("priceFrom", b.getPriceFrom());
+        }
+        if (b.getPriceTo() != null) {
+            jpql.append(" AND lc.price <= :priceTo ");
+            params.put("priceTo", b.getPriceTo());
+        }
+        if (b.getCpu() != null) {
+            jpql.append(" AND LOWER(c.model) LIKE :cpu ");
+            params.put("cpu", "%" + b.getCpu().toLowerCase() + "%");
+        }
+        if (b.getRam() != null && !b.getRam().isEmpty()) {
+            jpql.append(" AND r.capacity IN :rams ");
+            params.put("rams", b.getRam());
+        }
+        if (b.getGpu() != null && !b.getGpu().isEmpty()) {
+            jpql.append(" AND LOWER(g.name) IN :gpus ");
+            params.put("gpus", b.getGpu().stream()
+                                   .map(String::toLowerCase)
+                                   .toList());
+        }
+        if (b.getStorageCapacity() != null && !b.getStorageCapacity().isEmpty()) {
+            jpql.append(" AND s.capacity IN :storages ");
+            params.put("storages", b.getStorageCapacity());
+        }
+        if (b.getDisplaySizeFrom() != null) {
+            jpql.append(" AND d.size >= :dsFrom ");
+            params.put("dsFrom", b.getDisplaySizeFrom());
+        }
+        if (b.getDisplaySizeTo() != null) {
+            jpql.append(" AND d.size <= :dsTo ");
+            params.put("dsTo", b.getDisplaySizeTo());
+        }
 
-        Query query = entityManager.createNativeQuery(sql.toString(), LaptopConfigurationEntity.class);
+        // 3. Create query & bind params
+        TypedQuery<LaptopConfigurationEntity> query =
+            em.createQuery(jpql.toString(), LaptopConfigurationEntity.class);
+        params.forEach(query::setParameter);
+
+        // 4. Execute
         return query.getResultList();
     }
 }
